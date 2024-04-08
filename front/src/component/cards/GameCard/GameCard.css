@@ -1,0 +1,19 @@
+.column-content {
+    color: white;
+    text-align: center;
+    justify-content: center;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.join-button-container {
+    padding: 10px;
+}
+
+.column-title {
+    color: white;
+    text-align: center;
+    margin: 5px;
+    font-size: 18px;
+}

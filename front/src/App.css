@@ -1,0 +1,16 @@
+body {
+    background-color: #383534;
+}
+
+.game-info-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin: 30px;
+}
+
+@media only screen and (max-width: 1023px) {
+    .game-info-container {
+        margin: 10px;
+    }
+}

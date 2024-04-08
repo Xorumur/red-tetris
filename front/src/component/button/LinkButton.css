@@ -1,0 +1,13 @@
+.link-button {
+    display: flex;
+    justify-content: center;
+    text-decoration: none;
+}
+
+@media only screen and (max-width: 1023px) {
+    /* Your CSS rules for devices with a screen width less than 1024 pixels */
+    /* For example: */
+    a {
+        padding: 5px;
+    }
+}

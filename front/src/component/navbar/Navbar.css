@@ -1,0 +1,47 @@
+.crumb {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+  background-color: #1f1d1d;
+  padding: 15px;
+  margin: 0; /* Add this line to remove any default margin */
+  list-style-type: none; /* Remove default list styles */
+}
+
+.crumb-item {
+  display: inline;
+}
+
+.crumb-item a {
+  color: #ffa500;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.crumb-item a:hover {
+  color: #fe8d01; /* Changes text color to purple on hover */
+}
+
+.crumb-item a:active {
+  color: #ffa53f;
+}
+
+.game-title {
+  font-size: 24px;
+  color: red;
+}
+
+@media only screen and (max-width: 1023px) {
+  .game-title {
+    font-size: 18px;
+  }
+  .crumb-item a {
+    font-size: 16px;
+  }
+  .crumb {
+    padding: 10px;
+  }
+}
