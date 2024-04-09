@@ -1,4 +1,5 @@
 //https://socket.io/docs/v4/typescript/
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface ServerToClientEvents {
   noArg: () => void;
   basicEmit: (a: number, b: string, c: Buffer) => void;
@@ -6,10 +7,14 @@ interface ServerToClientEvents {
   boardUpdate: (board: string[][]) => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface ClientToServerEvents {
   joinGame: () => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface InterServerEvents {
   ping: () => void;
 }
+
+export {}

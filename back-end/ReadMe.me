@@ -1,0 +1,8 @@
+Back-end en node 18.0.0
+
+Set Username => event Username, data : { client: "mlecherb"} => event de retour UsernameOK - UsernameKO
+
+Join game => event Join, data : {client : "mlecherb", "player": "NotJustJoe"} => event de retour boardUpdate [ [{client: "mlecherb"}] , [{client: "NotJustJoe"}] ] // Game available to join
+
+Create a room => Event Create, data: {client: "mlecherb"} => event de retour boardUpdate [ [{client: "mlecherb"}] , [{client: "NotJustJoe"}] ] // Game available to join
+
