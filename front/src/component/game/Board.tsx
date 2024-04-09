@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import './Board.css';
 import { socket } from '../../sockets/socket';
+import { InputHandler } from './InputHandler';
 
 export const Board = () => {
   const defaultData = [
@@ -20,6 +21,7 @@ export const Board = () => {
 
   return (
     <div className="board-container">
+      <InputHandler/>
       {board.map((rows, idr) => (
         <div
           className="board-row"
