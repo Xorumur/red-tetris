@@ -9,8 +9,8 @@ const io = socketIo(server);
 
 const PORT = process.env.PORT || 5000;
 
-const user = [];
-const room = [[{client: "mlecherb"}]];
+const   user = [];
+let     room = [[{client: "mlecherb", socket : "test"} ]];
 
 server.listen(PORT, () => {
     console.log(`Serveur démarré sur le port ${PORT}`);
@@ -22,20 +22,21 @@ io.on('connection', (socket) => {
 
     socket.on('Username', (data) => {
         if (user.includes(data.client)) {
-            socket.send('UsernameKO');
+            socket.emit('UsernameKO');
             return ;
         }
         user.push({socket, client: data.client});
-        socket.send('UsernameOK');
+        socket.emit('UsernameOK');
     })
 
     socket.on('Create', (data) => {
         // if (alreadyInRoom(room, data.client))
         //     return;
         room.push([{socket, client: data.client}]);
-        // sendToAllUser('boardUpdate', getWaitingRoom(room));
+        const waitingRoom = getWaitingRoom(room);
+        room = room.filter((r) => r.length === 1 && r[0].client !== data.client);
+        sendToAllUser(user, 'roomUpdate', getWaitingRoom(room));
         const game = new Game(io, socket);
-        console.log(room);
     })
 
     socket.on('Join', (data) => {
@@ -43,8 +44,7 @@ io.on('connection', (socket) => {
             if (r.some((p) => p.client === data.player))
                 r.push({socket, client: data.client});
         })
-        sendToAllUser('boardUpdate', getWaitingRoom(room));
-        console.log(room);
+        sendToAllUser(user, 'roomUpdate', getWaitingRoom(room));
 
     })
 })

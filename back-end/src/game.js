@@ -47,6 +47,22 @@ class Game {
         this.io = io;
         this.client = client;
         this.game();
+
+        io.on('connection', (socket) => {
+            socket.on("left", (data) => {
+                if (this.collision(this.currentPiece, this.currentPiece.x - 1, this.currentPiece.y)) {
+                    return ;
+                } 
+            });
+
+            socket.on("right", (data) => {
+
+            });
+
+            socket.on("down", (data) => {
+
+            });
+        });
     }
 
     initializeGrid() {
@@ -74,21 +90,27 @@ class Game {
 
     game() {
         this.initBlock();
-        let t = this.getMap();
-        console.log(t);
-        console.log(this.gameGrid);
+        console.log(this.currentPiece);
+        this.currentPiece.y++;
+        // console.log(this.getMap());
+        this.rotation();
+        console.log(this.currentPiece);
+        console.log(this.getMap());
+        this.rotation();
+        console.log(this.currentPiece);
+        console.log(this.getMap());
     }
 
     initBlock() {
         this.generateRandomPiece();
         this.currentPiece.x = Math.floor(this.GRID_WIDTH / 2) - Math.floor(this.currentPiece.shape[0].length / 2);
     }
-
-    collision() {
-        for (let y = 0; y < this.currentPiece.shape.length; y++) {
-            for (let x = 0; x < this.currentPiece.shape[y].length; x++) {
-                if (this.currentPiece.shape[y][x] !== 0) {
-                    if (this.gameGrid[this.currentPiece.y + y][this.currentPiece.x + x] !== 0) {
+b 
+    collision(piece) {
+        for (let y = 0; y < piece.shape.length; y++) {
+            for (let x = 0; x < piece.shape[y].length; x++) {
+                if (piece.shape[y][x] !== 0) {
+                    if (this.gameGrid[piece.y + y][piece.x + x] !== 0) {
                         return true;
                     }
                 }
@@ -97,18 +119,38 @@ class Game {
         return false;
     }
 
-    getMap() {
-        // let newMap = this.gameGrid;
-        // this.currentPiece.shape.map((row, y) => {
-        //     row.map((cell, x) => {
-        //         if (cell !== 0) {
-        //             newMap[this.currentPiece.y + y][this.currentPiece.x + x] = cell;
-        //         }
-        //     });
-        // });
-        // return newMap;
+    rotation() {
+        let newShape = [];
+        const size = this.currentPiece.shape.length;
+        for (let i = 0; i < this.currentPiece.shape.length; i++) {
+            newShape.push([]);
+        }
+        for (let y = 0; y < this.currentPiece.shape.length; y++) {
+            for (let x = 0; x < this.currentPiece.shape[y].length; x++) {
+                newShape[x][y] = this.currentPiece.shape[size - y - 1][x];
+            }
+        }
+        if (this.collision(this.currentPiece, this.currentPiece.x, this.currentPiece.y)) {
+            return ;
+        } else {
+            this.currentPiece.shape = newShape;
+        }
+    }
 
-        let newMap = this.gameGrid;
+    eraseCurrentPiece() {
+        for (let y = 0; y < this.currentPiece.shape.length; y++) {
+            for (let x = 0; x < this.currentPiece.shape[y].length; x++) {
+                if (this.currentPiece.shape[y][x] !== 0) {
+                    this.gameGrid[this.currentPiece.y + y][this.currentPiece.x + x] = 0;
+                }
+            }
+        }
+    }
+
+    getMap() {
+        let newMap = this.gameGrid.map((row) => {
+            return row;
+        });
 
         for (let y = 0; y < this.currentPiece.shape.length; y++) {
             for (let x = 0; x < this.currentPiece.shape[y].length; x++) {
@@ -117,6 +159,7 @@ class Game {
                 }
             }
         }
+        // console.log(newMap);
         return newMap;
     }
 };

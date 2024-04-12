@@ -15,12 +15,19 @@ function sendMessageToRoom(room, event, data) {
 
 function sendToAllUser(user, event, data) {
     user.map((u) => {
+        if (u.socket === undefined)
+            return ;
         u.socket.emit(event, data);
     })
 }
 
 function getWaitingRoom(room) {
-    return room.filter((r) => r.length === 1);
+    let rooms = [];
+    room.forEach(element => {
+        if (element.length === 1)
+        rooms.push(element[0].client);
+    });
+    return rooms;
 }
 
 module.exports = {
