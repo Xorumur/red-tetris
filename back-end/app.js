@@ -30,7 +30,7 @@ io.on('connection', (socket) => {
             return ;
         }
         user.push({socket, client: data.client});
-        socket.emit('UsernameOK');
+        socket.emit('UsernameOK', {username: data.client}); //send back the allowed name so frontend knows what name to display
     })
 
     socket.on('Create', (data) => {

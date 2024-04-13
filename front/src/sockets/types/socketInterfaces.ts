@@ -2,7 +2,7 @@
 export interface ServerToClientEvents {
   boardUpdate: (board: string[][]) => void;
   roomUpdate: () => void; //all rooms updated  
-  UsernameOK: () => void; //if the username is accepted
+  UsernameOK: (data: {username: string}) => void; //if the username is accepted
   UsernameKO: () => void; //if the username is refused
 }
 
