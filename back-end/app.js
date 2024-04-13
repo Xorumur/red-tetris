@@ -5,9 +5,13 @@ const { alreadyInRoom, sendMessageToRoom, sendToAllUser, getWaitingRoom } = requ
 const Game = require('./src/game.js');
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
-
-const PORT = process.env.PORT || 5000;
+const io = socketIo(server, {
+    cors: {
+      origin: "http://localhost:3000",
+      methods: ["GET", "POST"]
+    }
+});
+const PORT = process.env.PORT || 4000;
 
 const   user = [];
 let     room = [[{client: "mlecherb", socket : "test"} ]];
@@ -45,6 +49,5 @@ io.on('connection', (socket) => {
                 r.push({socket, client: data.client});
         })
         sendToAllUser(user, 'roomUpdate', getWaitingRoom(room));
-
     })
 })

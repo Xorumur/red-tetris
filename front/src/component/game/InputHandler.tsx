@@ -9,19 +9,23 @@ interface KeyBoardEvent {
 const sendEventFromKey = (key: string) => {
   switch (key) {
     case 'ArrowUp': {
-      socket.emit('moveUp');
+      socket.emit('up');
       return;
     }
     case 'ArrowDown': {
-      socket.emit('moveDown');
+      socket.emit('down');
       return;
     }
     case 'ArrowLeft': {
-      socket.emit('moveLeft');
+      socket.emit('left');
       return;
     }
     case 'ArrowRight': {
-      socket.emit('moveRight');
+      socket.emit('right');
+      return;
+    }
+    case 'Spacebar': {
+      socket.emit('spacebar');
       return;
     }
   }

@@ -3,6 +3,7 @@ import { AppDarkTheme } from '../../../themes/dark';
 import { LinkButton } from '../../button/LinkButton';
 import "./GameCard.css"
 import { Board } from '../../game/Board';
+import { SocketUtils } from '../../../sockets/socketUtils';
 
 export interface GameCardProps {
   players: Player[];
@@ -39,7 +40,6 @@ export const GameCard = ({ players, status }: GameCardProps) => {
   const isButtonDisabled = status !== EGameStatus.LOBBY;
   const playerShown = players;
   const [showTetris, setShowTetris] = useState<boolean>(true);
-
   return (
     <>
     <div
@@ -82,7 +82,11 @@ export const GameCard = ({ players, status }: GameCardProps) => {
           disabled={isButtonDisabled}>
           <p>Join Game</p>
         </LinkButton>
-        <button onClick={() => setShowTetris(!showTetris)}>{showTetris ? "Despawn this board !" : "Spawn the board"}</button>
+        <button onClick={() => {
+          setShowTetris(!showTetris);
+          console.log( "yoyoyoy")
+          SocketUtils.createGame();
+        }}>{showTetris ? "Despawn this board !" : "Spawn the board"}</button>
       </div>
     </div>
       {showTetris && <Board/>}
