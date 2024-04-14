@@ -1,7 +1,9 @@
+import { Room } from "../../store/slices/gameSlice";
+
 //https://socket.io/docs/v4/typescript/
 export interface ServerToClientEvents {
   boardUpdate: (board: string[][]) => void;
-  roomUpdate: () => void; //all rooms updated  
+  roomUpdate: (data: Room[]) => void; //all rooms updated  
   UsernameOK: (data: {username: string}) => void; //if the username is accepted
   UsernameKO: () => void; //if the username is refused
 }

@@ -48,6 +48,7 @@ io.on('connection', (socket) => {
             if (r.some((p) => p.client === data.player))
                 r.push({socket, client: data.client});
         })
+		console.log(room);
         sendToAllUser(user, 'roomUpdate', getWaitingRoom(room));
     })
 })

@@ -5,15 +5,10 @@ import { SocketUtils } from "../../sockets/socketUtils";
 import { socket } from "../../sockets/socket";
 import { setUsername } from "../../store/slices/userSlice";
 
-export const UsernameModal = () => {
-	const [modal, setModal] = useState(false);
+export const UsernameModal = ({show}: {show: boolean}) => {
 	const [isUsernameInvalid, setIsUsernameInvalid] = useState<boolean>(false);
 
-	const toggleModal = () => {
-		setModal(!modal);
-	};
-
-	if (modal) {
+	if (show) {
 		document.body.classList.add("active-modal");
 	} else {
 		document.body.classList.remove("active-modal");
@@ -66,13 +61,8 @@ export const UsernameModal = () => {
 
 	return (
 		<>
-			<button onClick={toggleModal} className="btn-modal">
-				Open
-			</button>
-
-			{modal && (
+			{show && (
 				<div className="modal">
-					<div onClick={toggleModal} className="overlay"></div>
 					<div className="modal-content">
 						{isUsernameInvalid && <div>You name is invalid, needs to be between 3-32 characters long</div>}
 						<span className="close" onClick={onClose}>
@@ -87,9 +77,6 @@ export const UsernameModal = () => {
 						/>
 						<button onClick={handleSubmit}>Submit</button>
 					</div>
-					<button className="close-modal" onClick={toggleModal}>
-						CLOSE
-					</button>
 				</div>
 			)}
 		</>

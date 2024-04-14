@@ -1,20 +1,37 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { SocketUtils } from "../../sockets/socketUtils";
 import { EGameStatus, GameCard } from "../cards/GameCard/GameCard";
 import { useSelector } from "react-redux";
-import { RootState } from "../../store/store";
+import { RootState, useAppDispatch } from "../../store/store";
 import { UsernameModal } from "../modal/UsernameModal";
+import { socket } from "../../sockets/socket";
+import { setAvailableRooms } from "../../store/slices/gameSlice";
 
 export const MainPage = () => {
+	const dispatch = useAppDispatch();
 	const username = useSelector(
 		(state: RootState) => state.userSlice.username
 	);
+	const availableRooms = useSelector(
+		(state: RootState) => state.gameSlice.availableRooms
+	);
 
+	useEffect(() => {
+		socket.on("roomUpdate", (data) => {
+			console.log("room update", data);
+			dispatch(setAvailableRooms(data));
+		});
+		return () => {
+			socket.off("roomUpdate");
+		};
+	}, []);
 
 	return (
 		<div>
 			{username === null ? (
-				<div><UsernameModal/></div>
+				<div>
+					<UsernameModal show={true}/>
+				</div>
 			) : (
 				<div className="game-info-container">
 					<div
@@ -30,107 +47,13 @@ export const MainPage = () => {
 							CREATE A GAME
 						</button>
 					</div>
-
-					<GameCard
-						players={[
-							{
-								name: "Thomas",
-							},
-							{
-								name: "Asma",
-							},
-							{
-								name: "Pedro",
-							},
-							{
-								name: "Yooiuhuihui",
-							},
-							{
-								name: "Coucou",
-							},
-						]}
-						status={EGameStatus.LOBBY}
-					/>
-					<GameCard
-						players={[
-							{
-								name: "Thomas",
-							},
-							{
-								name: "Asma",
-							},
-							{
-								name: "Pedro",
-							},
-							{
-								name: "Yooo",
-							},
-							{
-								name: "Coucou",
-							},
-						]}
-						status={EGameStatus.LOBBY}
-					/>
-					<GameCard
-						players={[
-							{
-								name: "Thomas",
-							},
-							{
-								name: "Asma",
-							},
-							{
-								name: "Pedro",
-							},
-							{
-								name: "Yooo",
-							},
-							{
-								name: "Coucou",
-							},
-						]}
-						status={EGameStatus.LOBBY}
-					/>
-					<GameCard
-						players={[
-							{
-								name: "Thomas",
-							},
-							{
-								name: "Asma",
-							},
-							{
-								name: "Pedro",
-							},
-							{
-								name: "Yooo",
-							},
-							{
-								name: "Coucou",
-							},
-						]}
-						status={EGameStatus.LOBBY}
-					/>
-					<GameCard
-						players={[
-							{
-								name: "Thomas",
-							},
-							{
-								name: "Asma",
-							},
-							{
-								name: "Pedro",
-							},
-							{
-								name: "Yooo",
-							},
-							{
-								name: "Coucou",
-							},
-						]}
-						status={EGameStatus.LOBBY}
-					/>
+					{availableRooms.map((room, idx) => (
+						<GameCard
+							key={idx}
+							players={[{name: room.client}]}
+							status={EGameStatus.LOBBY}
+						/>
+					))}
 				</div>
 			)}
 		</div>
