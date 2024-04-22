@@ -24,6 +24,7 @@ function sendToAllUser(user, event, data) {
 function getWaitingRoom(room) {
     let rooms = [];
     room.forEach(element => {
+        const players = [];
         if (element.length === 1)
         rooms.push(element[0].client);
     });

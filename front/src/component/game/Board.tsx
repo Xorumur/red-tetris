@@ -1,8 +1,8 @@
 //array of array of colors (ex values)
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './Board.css';
 import { socket } from '../../sockets/socket';
-import { InputHandler } from './InputHandler';
+import { GameInputHandler } from '../pages/utils/GameInputHandler';
 
 export const Board = () => {
   const defaultData = [
@@ -14,14 +14,18 @@ export const Board = () => {
   ];
   const [board, setBoard] = useState<string[][]>(defaultData);
 
-  socket.on("boardUpdate", (newBoard) => {
-    console.log("Board updated !")
-    setBoard(newBoard);
-  })
+  useEffect(() => {
+    socket.on("boardUpdate", data => {
+      console.log('board update', data);
+      setBoard(board);
+    });
+    return () => {
+      socket.off('boardUpdate');
+    };
+  }, []);
 
   return (
     <div className="board-container">
-      <InputHandler/>
       {board.map((rows, idr) => (
         <div
           className="board-row"

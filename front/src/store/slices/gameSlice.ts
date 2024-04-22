@@ -1,29 +1,35 @@
 //setAvailableRooms
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { EGameStatus } from '../../component/cards/GameCard/GameCard';
 
 export interface Room {
-	socket: string;
-	client: string;
+  socket: string;
+  client: string;
 }
 
 export interface GameInitialState {
-	availableRooms: Room[];
+  availableRooms: Room[];
+  gameStatus: EGameStatus;
 }
 
 const initialState: GameInitialState = {
-	availableRooms: [],
+  availableRooms: [],
+  gameStatus: EGameStatus.LOBBY,
 };
 
 export const gameSlice = createSlice({
-	name: "game",
-	initialState,
-	reducers: {
-		setAvailableRooms: (state, action: PayloadAction<Room[]>) => {
-			state.availableRooms = action.payload;
-		},
+  name: 'game',
+  initialState,
+  reducers: {
+    setAvailableRooms: (state, action: PayloadAction<Room[]>) => {
+      state.availableRooms = action.payload;
+    },
+	setGameStatus: (state, action: PayloadAction<EGameStatus>) => {
+		state.gameStatus = action.payload;
 	},
+  },
 });
 
-export const { setAvailableRooms } = gameSlice.actions;
+export const { setAvailableRooms, setGameStatus } = gameSlice.actions;
 
 export const gameReducer = gameSlice.reducer;
