@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useParams } from "react-router-dom";
 import { Board } from "../../../game/Board";
 import { GameInputHandler } from "../../utils/GameInputHandler";
@@ -7,15 +7,20 @@ import { RootState } from "../../../../store/store";
 import { setGameStatus } from "../../../../store/slices/gameSlice";
 import { EGameStatus } from "../../../cards/GameCard/GameCard";
 import { useCountdown } from "../../../../utils/hooks/useCountdown";
+import { socket } from "../../../../sockets/socket";
 
 export const Game = () => {
     const { room, player } = useParams();
     const gameStatus = useSelector((state: RootState) => state.gameSlice.gameStatus);
+    const username = useSelector((state: RootState) => state.userSlice.username)!;
     const countDown = useCountdown(new Date().getTime() + 5000)
     const onStartGame = () => {
         setGameStatus(EGameStatus.STARTING);
-        
     }
+
+    useEffect(() => {
+      socket.emit("Join", {client: username, username: player!});
+    }, []);
 
     return (
       <div>
