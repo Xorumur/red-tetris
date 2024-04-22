@@ -1,7 +1,7 @@
 const http = require('http');
 const express = require('express');
 const socketIo = require('socket.io');
-const { alreadyInRoom, sendMessageToRoom, sendToAllUser, getWaitingRoom, getRoomByName, createHashRoomId } = require('./src/socket_utils.js');
+const { alreadyInRoom, sendMessageToRoom, sendToAllUser, getWaitingRoom, getRoomByName, createHashRoomId, createSimpleHash, getRoom, isUsernameValid } = require('./src/socket_utils.js');
 const Game = require('./src/game.js');
 const app = express();
 const server = http.createServer(app);
@@ -14,7 +14,17 @@ const io = socketIo(server, {
 const PORT = process.env.PORT || 4000;
 
 const   user = [];
-let     room = [[{client: "mlecherb", socket : "test"} ]];
+let     room = [
+    {
+        id: "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822", 
+        players: [
+            {
+                client: "mlecherb", 
+                socket: "test"
+            }
+        ]
+    }
+];
 
 server.listen(PORT, () => {
     console.log(`Serveur démarré sur le port ${PORT}`);
@@ -34,33 +44,52 @@ io.on('connection', (socket) => {
     })
 
     socket.on('Create', (data) => {
-        // if (alreadyInRoom(room, data.client))
-        //     return;
-        room.push([{socket, client: data.client}]);
-        const waitingRoom = getWaitingRoom(room);
-        room = room.filter((r) => r.length === 1 && r[0].client !== data.client);
-        sendToAllUser(user, 'roomUpdate', getWaitingRoom(room));
-        // const game = new Game(io, socket);
+        if (!isUsernameValid(user, data.client)) {
+            socket.emit('CreateKO', { error: "Invalid username" });
+            return;
+        }
+        else if (alreadyInRoom(room, data.client)) {
+            socket.emit('CreateKO', { error: "User already in room" });
+            return;
+        }
+
+
+        room.push({id : createSimpleHash(data.client), players : [{socket, client: data.client}]});
+        const rooms = getRoomByName(room, data.client);
+        socket.emit('CreateOK', rooms); 
+        sendToAllUser(user, 'roomUpdate', rooms);
     })
 
+    socket.on('Start', (date) => {
+
+    });
+
     socket.on('Join', (data) => {
-        let currRoom; 
-        room.map((r) => {
-            if (r.some((p) => p.client === data.player)) {
-                r.push({socket, client: data.client});
-                currRoom = r;
-            }
-        });
+        if (!isUsernameValid(user, data.client)) {
+            socket.emit('JoinOK', { error: "Invalid username" });
+            return;
+        }
+        else if (alreadyInRoom(room, data.client)) {
+            socket.emit('JoinKO', { error: "User already in room" });
+            return;
+        }
 
-
-
-        // const currentRoom = getRoomByName(room, data.player);
-        // console.log("CurrRoom", currentRoom);
-        // if (currentRoom.length === 2) {
-        //     room.id = createHashRoomId(currentRoom);
-        //     console.log("CurrRoom", currentRoom);
-        //     const game = new Game(io, socket);
-        // }
-        sendToAllUser(user, 'roomUpdate', getWaitingRoom(room));
+        const roomWithClient = room.find(item =>
+            item.players.some(player =>
+                player.client === data.player
+            )
+        );
+        
+        if (roomWithClient) {
+            roomWithClient.players.push({
+                client: data.client,
+                socket: socket
+            });
+        
+            socket.emit('JoinOK', getRoomByName(room, data.client));
+            sendToAllUser(user, 'roomUpdate', getWaitingRoom(room));
+        } else {
+            socket.emit('JoinKO', { error: "Room not found" });
+        }
     })
 })

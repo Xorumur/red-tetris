@@ -1,12 +1,16 @@
 const crypto = require('crypto');
 
 function alreadyInRoom(room, clientUsername) {
-    let alreadyInRoom = false;
-    room.map((r) => {
-        if (r.some((p) => p.client === clientUsername))
-            alreadyInRoom = true;
-    });
-    return alreadyInRoom;
+    const result = room.filter(item =>
+        item.players.some(player =>
+            player.client === clientUsername
+        )
+    );
+
+    if (result.length > 0)
+        return true;
+    else 
+        return false;
 }
 
 function sendMessageToRoom(room, event, data) {
@@ -24,11 +28,25 @@ function sendToAllUser(user, event, data) {
 }
 
 function getWaitingRoom(room) {
-    let rooms = [];
+    let rooms = {id: "", players: []};
     room.forEach(element => {
         const players = [];
         if (element.length === 1)
-        rooms.push(element[0].client);
+        rooms.players.push(element[0].client);
+    });
+    rooms.id = room.id;
+    return rooms;
+}
+
+function getRoom(room) {
+    let rooms = [];
+    room.forEach(element => {
+        // console.log("Element", element);
+        const players = [];
+        element.players.forEach(p => {
+            players.push(p.client);
+        });
+        rooms.push({id: element.id, players: players});
     });
     return rooms;
 }
@@ -41,14 +59,47 @@ function createHashRoomId(room) {
 
 }
 
-function getRoomByName(room, username) {
-    let gerRoom;
+function createSimpleHash(username) {
+    let hash = crypto.createHash('sha256');
+    hash.update(username);
+    return hash.digest('hex');
+}
 
-    room.map((r) => {
-        if (r.some((p) => p.client === username))
-            gerRoom = r;
+function getRoomByName(room, username) {
+    
+    const result = room.filter(item =>
+        item.players.some(player =>
+            player.client === username
+        )
+    );
+
+    const resultWithoutSocket = result.map(item => {
+        // Créer une copie de l'objet courant
+        const { socket, ...itemWithoutSocket } = item;
+    
+        // Retirer l'élément 'socket' de chaque objet joueur dans le tableau 'players'
+        const playersWithoutSocket = itemWithoutSocket.players.map(player => {
+            const { socket, ...playerWithoutSocket } = player;
+            return playerWithoutSocket;
+        });
+    
+        // Retourner l'objet sans la propriété 'socket'
+        return { ...itemWithoutSocket, players: playersWithoutSocket };
     });
-    return gerRoom;
+    
+    return resultWithoutSocket[0];
+}
+
+function isUsernameValid(user, username) {
+    if (username === undefined || username === "")
+        return false;
+    let returnState = false;
+    user.forEach(element => {
+        if (element.client === username)
+            returnState = true;
+    });
+
+    return returnState;
 }
 
 module.exports = {
@@ -58,4 +109,7 @@ module.exports = {
     getWaitingRoom,
     getRoomByName,
     createHashRoomId,
+    getRoom,
+    createSimpleHash,
+    isUsernameValid
 }
