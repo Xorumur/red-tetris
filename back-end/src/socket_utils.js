@@ -45,16 +45,22 @@ function getWaitingRoom(room) {
 }
 
 function getRoom(room) {
-    let rooms = [];
-    room.forEach(element => {
-        // console.log("Element", element);
-        const players = [];
-        element.players.forEach(p => {
-            players.push(p.client);
+    console.log(room);
+    const resultWithoutSocket = room.map(item => {
+        // Créer une copie de l'objet courant
+        const { socket, ...itemWithoutSocket } = item;
+    
+        // Retirer l'élément 'socket' de chaque objet joueur dans le tableau 'players'
+        const playersWithoutSocket = itemWithoutSocket.players.map(player => {
+            const { socket, ...playerWithoutSocket } = player;
+            return playerWithoutSocket;
         });
-        rooms.push({id: element.id, players: players});
+    
+        // Retourner l'objet sans la propriété 'socket'
+        return { ...itemWithoutSocket, players: playersWithoutSocket };
     });
-    return rooms;
+    console.log("resutlws", resultWithoutSocket);
+    return resultWithoutSocket;
 }
 
 function createHashRoomId(room) {

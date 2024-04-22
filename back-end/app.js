@@ -44,7 +44,7 @@ io.on('connection', (socket) => {
     })
 
     socket.on('askRoom', () => {
-        sendToAllUser(user, 'roomUpdate', rooms);
+        sendToAllUser(user, 'roomUpdate', getRoom(room));
     })
 
     socket.on('Create', (data) => {
