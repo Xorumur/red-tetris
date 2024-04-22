@@ -41,6 +41,7 @@ io.on('connection', (socket) => {
         }
         user.push({socket, client: data.client});
         socket.emit('UsernameOK', {username: data.client}); //send back the allowed name so frontend knows what name to display
+        sendToAllUser(user, 'roomUpdate', rooms);
     })
 
     socket.on('Create', (data) => {
