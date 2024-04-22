@@ -1,7 +1,7 @@
 const http = require('http');
 const express = require('express');
 const socketIo = require('socket.io');
-const { alreadyInRoom, sendMessageToRoom, sendToAllUser, getWaitingRoom } = require('./src/socket_utils.js');
+const { alreadyInRoom, sendMessageToRoom, sendToAllUser, getWaitingRoom, getRoomByName, createHashRoomId } = require('./src/socket_utils.js');
 const Game = require('./src/game.js');
 const app = express();
 const server = http.createServer(app);
@@ -40,15 +40,27 @@ io.on('connection', (socket) => {
         const waitingRoom = getWaitingRoom(room);
         room = room.filter((r) => r.length === 1 && r[0].client !== data.client);
         sendToAllUser(user, 'roomUpdate', getWaitingRoom(room));
-        const game = new Game(io, socket);
+        // const game = new Game(io, socket);
     })
 
     socket.on('Join', (data) => {
+        let currRoom; 
         room.map((r) => {
-            if (r.some((p) => p.client === data.player))
+            if (r.some((p) => p.client === data.player)) {
                 r.push({socket, client: data.client});
-        })
-		console.log(room);
+                currRoom = r;
+            }
+        });
+
+
+
+        // const currentRoom = getRoomByName(room, data.player);
+        // console.log("CurrRoom", currentRoom);
+        // if (currentRoom.length === 2) {
+        //     room.id = createHashRoomId(currentRoom);
+        //     console.log("CurrRoom", currentRoom);
+        //     const game = new Game(io, socket);
+        // }
         sendToAllUser(user, 'roomUpdate', getWaitingRoom(room));
     })
 })

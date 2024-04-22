@@ -1,3 +1,5 @@
+const crypto = require('crypto');
+
 function alreadyInRoom(room, clientUsername) {
     let alreadyInRoom = false;
     room.map((r) => {
@@ -30,9 +32,29 @@ function getWaitingRoom(room) {
     return rooms;
 }
 
+function createHashRoomId(room) {
+    let hash = crypto.createHash('sha256');
+    const stringCombined = room.map((r) => r.client).join('');
+    hash.update(stringCombined);
+    return hash.digest('hex');
+
+}
+
+function getRoomByName(room, username) {
+    let gerRoom;
+
+    room.map((r) => {
+        if (r.some((p) => p.client === username))
+            gerRoom = r;
+    });
+    return gerRoom;
+}
+
 module.exports = {
     alreadyInRoom,
     sendMessageToRoom,
     sendToAllUser,
-    getWaitingRoom
+    getWaitingRoom,
+    getRoomByName,
+    createHashRoomId,
 }

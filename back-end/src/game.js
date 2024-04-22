@@ -1,38 +1,143 @@
 const Tetriminos = [
     [
-        [0, 0, 0, 0],
-        [1, 1, 1, 1],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0]
+        [
+            [0, 0, 0, 0],
+            [1, 1, 1, 1],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0]
+        ],
+        [
+            [0, 0, 1, 0],
+            [0, 0, 1, 0],
+            [0, 0, 1, 0],
+            [0, 0, 1, 0]
+        ],
+        [
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [1, 1, 1, 1],
+            [0, 0, 0, 0]
+        ],
+        [
+            [0, 1, 0, 0],
+            [0, 1, 0, 0],
+            [0, 1, 0, 0],
+            [0, 1, 0, 0],
+        ],
     ],
     [
-        [1, 0, 0],
-        [1, 1, 1],
-        [0, 0, 0]
+        [
+            [1, 0, 0],
+            [1, 1, 1],
+            [0, 0, 0],
+        ],
+        [
+            [0, 1, 1],
+            [0, 1, 0],
+            [0, 1, 0],
+        ],
+        [
+            [0, 0, 0],
+            [1, 1, 1],
+            [0, 0, 1],
+        ],
+        [
+            [0, 1, 0],
+            [0, 1, 0],
+            [1, 1, 0],
+        ],
     ],
     [
-        [0, 0, 1],
-        [1, 1, 1],
-        [0, 0, 0]
+        [
+            [0, 0, 1],
+            [1, 1, 1],
+            [0, 0, 0]
+        ],
+        [
+            [0, 1, 0],
+            [0, 1, 0],
+            [0, 1, 1]
+        ],
+        [
+            [0, 0, 0],
+            [1, 1, 1],
+            [1, 0, 0]
+        ],
+        [
+            [1, 1, 0],
+            [0, 1, 0],
+            [0, 1, 0]
+        ]
     ],
     [
         [1, 1],
         [1, 1]
     ],
     [
-        [0, 1, 1],
-        [1, 1, 0],
-        [0, 0, 0]
+        [
+            [0, 1, 1],
+            [1, 1, 0],
+            [0, 0, 0]
+        ],
+        [
+            [0, 1, 0],
+            [0, 1, 1],
+            [0, 0, 1]
+        ],
+        [
+            [0, 0, 0],
+            [0, 1, 1],
+            [1, 1, 0]
+        ],
+        [
+            [1, 0, 0],
+            [1, 1, 0],
+            [0, 1, 0]
+        ]
     ],
     [
-        [0, 1, 0],
-        [1, 1, 1],
-        [0, 0, 0]
+        [
+            [0, 1, 0],
+            [1, 1, 1],
+            [0, 0, 0]
+        ],
+        [
+            [0, 1, 0],
+            [0, 1, 1],
+            [0, 1, 0]
+        ],
+        [
+            [0, 0, 0],
+            [1, 1, 1],
+            [0, 1, 0]
+        ],
+        [
+            [0, 1, 0],
+            [1, 1, 0],
+            [0, 1, 0]
+        ]
     ],
     [
-        [1, 1, 0],
-        [0, 1, 1],
-        [0, 0, 0]
+        [
+            [1, 1, 0],
+            [0, 1, 1],
+            [0, 0, 0]
+        ],
+        [
+            [0, 0, 1],
+            [0, 1, 1],
+            [0, 1, 0]
+        ],
+        [
+            [0, 0, 0],
+            [1, 1, 0],
+            [0, 1, 1]
+        ],
+        [
+            [0, 1, 0],
+            [1, 1, 0],
+            [1, 0, 0]
+        ]
     ]
 ];
 
@@ -82,23 +187,40 @@ class Game {
         const keys = Object.keys(Tetriminos);
         const randomKey = keys[Math.floor(Math.random() * keys.length)];
         this.currentPiece = {
-            shape: Tetriminos[randomKey],
+            shape: Tetriminos[randomKey][0],
+            forms: Tetriminos[randomKey],
+            currentForm: 0,
             x: 0,
             y: 0
+        };
+    }
+
+    copyPiece(piece) {
+        return {
+            shape: piece.shape,
+            forms: piece.forms,
+            currentForm: piece.currentForm,
+            x: piece.x,
+            y: piece.y
         };
     }
 
     game() {
         this.initBlock();
         console.log(this.currentPiece);
-        this.currentPiece.y++;
-        // console.log(this.getMap());
-        this.rotation();
-        console.log(this.currentPiece);
-        console.log(this.getMap());
-        this.rotation();
-        console.log(this.currentPiece);
-        console.log(this.getMap());
+        while (this.collision(this.currentPiece) === false) {
+            for (let y = 0; y < this.gameGrid.length; y++) {
+                const copyPiece = this.copyPiece(this.currentPiece);
+                copyPiece.y++;
+                if (this.collision(copyPiece) === false) {
+                    this.currentPiece.y++;
+                } else 
+                    break ;
+                console.log(this.getMap());
+            }
+            this.saveCurrentPiece();
+            this.initBlock();
+        }
     }
 
     initBlock() {
@@ -111,6 +233,7 @@ b
             for (let x = 0; x < piece.shape[y].length; x++) {
                 if (piece.shape[y][x] !== 0) {
                     if (this.gameGrid[piece.y + y][piece.x + x] !== 0) {
+                        // console.log(this.gameGrid[piece.y + y][piece.x + x]);
                         return true;
                     }
                 }
@@ -119,21 +242,34 @@ b
         return false;
     }
 
-    rotation() {
-        let newShape = [];
-        const size = this.currentPiece.shape.length;
-        for (let i = 0; i < this.currentPiece.shape.length; i++) {
-            newShape.push([]);
-        }
+    saveCurrentPiece() {
         for (let y = 0; y < this.currentPiece.shape.length; y++) {
             for (let x = 0; x < this.currentPiece.shape[y].length; x++) {
-                newShape[x][y] = this.currentPiece.shape[size - y - 1][x];
+                if (this.currentPiece.shape[y][x] !== 0) {
+                    this.gameGrid[this.currentPiece.y + y][this.currentPiece.x + x] = this.currentPiece.shape[y][x];
+                }
             }
         }
+    }
+
+    rotation() {
+        let newShape = [];
+        // const size = this.currentPiece.shape.length;
+        // for (let i = 0; i < this.currentPiece.shape.length; i++) {
+        //     newShape.push([]);
+        // }
+        // for (let y = 0; y < this.currentPiece.shape.length; y++) {
+        //     for (let x = 0; x < this.currentPiece.shape[y].length; x++) {
+        //         newShape[x][y] = this.currentPiece.shape[size - y - 1][x];
+        //     }
+        // }
+        newShape = this.currentPiece.forms[this.currentPiece.currentForm + 1] || this.currentPiece.forms[0];
+
         if (this.collision(this.currentPiece, this.currentPiece.x, this.currentPiece.y)) {
             return ;
         } else {
-            this.currentPiece.shape = newShape;
+            this.incrShape();
+            // this.currentPiece.shape = newShape;
         }
     }
 
@@ -148,10 +284,9 @@ b
     }
 
     getMap() {
-        let newMap = this.gameGrid.map((row) => {
-            return row;
-        });
-
+        // Créer une copie profonde de gameGrid
+        let newMap = this.gameGrid.map(row => [...row]);
+    
         for (let y = 0; y < this.currentPiece.shape.length; y++) {
             for (let x = 0; x < this.currentPiece.shape[y].length; x++) {
                 if (this.currentPiece.shape[y][x] !== 0) {
@@ -159,8 +294,14 @@ b
                 }
             }
         }
-        // console.log(newMap);
         return newMap;
+    }
+
+    incrShape() {
+        this.currentPiece.currentForm = this.currentPiece.currentForm + 1;
+        if (this.currentPiece.currentForm >= this.currentPiece.forms.length)
+            this.currentPiece.currentForm = 0;
+        this.currentPiece.shape = this.currentPiece.forms[this.currentPiece.currentForm];
     }
 };
 
