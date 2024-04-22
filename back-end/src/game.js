@@ -142,7 +142,7 @@ const Tetriminos = [
 ];
 
 class Game {
-        constructor(io, client) {
+        constructor(io, client, roomId) {
         this.GRID_WIDTH = 6;
         this.GRID_HEIGHT = 6;
         this.gameGrid = [];
@@ -152,6 +152,7 @@ class Game {
         this.io = io;
         this.client = client;
         this.game();
+        this.roomId = roomId;
 
         io.on('connection', (socket) => {
             socket.on("left", (data) => {

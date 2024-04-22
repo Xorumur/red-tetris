@@ -13,9 +13,15 @@ function alreadyInRoom(room, clientUsername) {
         return false;
 }
 
+// function sendMessageToRoom(room, event, data) {
+//     room.map((r) => {
+//         r.socket.send(event, data);
+//     });
+// }
+
 function sendMessageToRoom(room, event, data) {
-    room.map((r) => {
-        r.socket.send(event, data);
+    room.players.forEach(element => {
+        element.socket.emit(event, data);
     });
 }
 
@@ -65,6 +71,24 @@ function createSimpleHash(username) {
     return hash.digest('hex');
 }
 
+function deleteSocket(room) {
+    const resultWithoutSocket = room.map(item => {
+        // Créer une copie de l'objet courant
+        const { socket, ...itemWithoutSocket } = item;
+    
+        // Retirer l'élément 'socket' de chaque objet joueur dans le tableau 'players'
+        const playersWithoutSocket = itemWithoutSocket.players.map(player => {
+            const { socket, ...playerWithoutSocket } = player;
+            return playerWithoutSocket;
+        });
+    
+        // Retourner l'objet sans la propriété 'socket'
+        return { ...itemWithoutSocket, players: playersWithoutSocket };
+    });
+    
+    return resultWithoutSocket[0];
+}
+
 function getRoomByName(room, username) {
     
     const result = room.filter(item =>
@@ -111,5 +135,6 @@ module.exports = {
     createHashRoomId,
     getRoom,
     createSimpleHash,
-    isUsernameValid
+    isUsernameValid,
+    deleteSocket
 }

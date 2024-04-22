@@ -1,7 +1,7 @@
 const http = require('http');
 const express = require('express');
 const socketIo = require('socket.io');
-const { alreadyInRoom, sendMessageToRoom, sendToAllUser, getWaitingRoom, getRoomByName, createHashRoomId, createSimpleHash, getRoom, isUsernameValid } = require('./src/socket_utils.js');
+const { alreadyInRoom, sendMessageToRoom, sendToAllUser, getWaitingRoom, getRoomByName, createHashRoomId, createSimpleHash, getRoom, isUsernameValid, deleteSocket } = require('./src/socket_utils.js');
 const Game = require('./src/game.js');
 const app = express();
 const server = http.createServer(app);
@@ -60,13 +60,16 @@ io.on('connection', (socket) => {
         sendToAllUser(user, 'roomUpdate', rooms);
     })
 
-    socket.on('Start', (date) => {
+    socket.on('Start', (data) => {
+        const currRoom = getRoomByName(room, data.client);
 
+
+        sendMessageToRoom(room, 'GameStarted', {});
     });
 
     socket.on('Join', (data) => {
         if (!isUsernameValid(user, data.client)) {
-            socket.emit('JoinOK', { error: "Invalid username" });
+            socket.emit('JoinKO', { error: "Invalid username" });
             return;
         }
         else if (alreadyInRoom(room, data.client)) {
