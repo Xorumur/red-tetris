@@ -15,9 +15,12 @@
     },
     "plugins": [
         "@typescript-eslint",
-        "react"
+        "react",
+        "unused-imports"
     ],
     "rules": {
-        "@typescript-eslint/no-namespace": "off"
+        "@typescript-eslint/no-namespace": "off",
+        "@typescript-eslint/no-unused-vars": "off",
+        "no-mixed-spaces-and-tabs": "off"
     }
 }

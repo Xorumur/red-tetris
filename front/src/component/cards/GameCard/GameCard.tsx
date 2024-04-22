@@ -1,17 +1,15 @@
 import React, { useState } from 'react';
 import { AppDarkTheme } from '../../../themes/dark';
 import { LinkButton } from '../../button/LinkButton';
-import "./GameCard.css"
+import './GameCard.css';
 import { Board } from '../../game/Board';
 import { SocketUtils } from '../../../sockets/socketUtils';
+import { Link } from 'react-router-dom';
 
 export interface GameCardProps {
-  players: Player[];
+  players: string[];
+  roomName: string;
   status: EGameStatus;
-}
-
-interface Player {
-  name: string;
 }
 
 export enum EGameStatus {
@@ -36,12 +34,10 @@ const getColorFromStatus = (status: EGameStatus) => {
 
 const theme = AppDarkTheme;
 
-export const GameCard = ({ players, status }: GameCardProps) => {
+export const GameCard = ({ players, roomName, status }: GameCardProps) => {
   const isButtonDisabled = status !== EGameStatus.LOBBY;
   const playerShown = players;
-  const [showTetris, setShowTetris] = useState<boolean>(true);
   return (
-    <>
     <div
       style={{
         display: 'grid',
@@ -68,7 +64,7 @@ export const GameCard = ({ players, status }: GameCardProps) => {
               <div
                 style={{ color: 'green', display: 'inline' }}
                 key={idx}>
-                {player.name}{' '}
+                {player}{' '}
               </div>
             ))
           ) : (
@@ -80,16 +76,9 @@ export const GameCard = ({ players, status }: GameCardProps) => {
         <LinkButton
           link="/game"
           disabled={isButtonDisabled}>
-          <p>Join Game</p>
+          <Link to={`/${roomName}/${"testos"}`}>Join Game</Link>
         </LinkButton>
-        <button onClick={() => {
-          setShowTetris(!showTetris);
-          console.log( "yoyoyoy")
-          SocketUtils.createGame();
-        }}>{showTetris ? "Despawn this board !" : "Spawn the board"}</button>
       </div>
     </div>
-      {showTetris && <Board/>}
-      </>
   );
 };

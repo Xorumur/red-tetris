@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { socket } from '../../sockets/socket';
+import { socket } from '../../../sockets/socket';
 
 interface KeyBoardEvent {
   key: string;
@@ -31,7 +31,7 @@ const sendEventFromKey = (key: string) => {
   }
 };
 
-export const InputHandler = () => {
+export const GameInputHandler = () => {
   const [prevKeyPressed, setPrevKeyPressed] = useState<string | null>(null);
   useEffect(() => {
     const handleKeyDown = (event: KeyBoardEvent) => {
