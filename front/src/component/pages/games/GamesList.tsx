@@ -1,41 +1,53 @@
-import React, { useEffect } from 'react';
-import { SocketUtils } from '../../../sockets/socketUtils';
+import React, { useEffect, useState } from 'react';
 import { RootState, useAppDispatch } from '../../../store/store';
 import { useSelector } from 'react-redux';
 import { EGameStatus, GameCard } from '../../cards/GameCard/GameCard';
 import { socket } from '../../../sockets/socket';
-import { setAvailableRooms } from '../../../store/slices/gameSlice';
+import { Room, setAvailableRooms } from '../../../store/slices/gameSlice';
 import { CreateGameButton } from '../../button/CreateGameButton';
+import { useNavigate } from 'react-router-dom';
 
 export const GamesList = () => {
-  const availableRooms = useSelector((state: RootState) => state.gameSlice.availableRooms);
-  const dispatch = useAppDispatch();
+  const [availableRooms, setAvailableRooms] = useState<Room[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     socket.on('roomUpdate', data => {
       console.log('room update', data);
-      dispatch(setAvailableRooms(data));
+      setAvailableRooms(data);
     });
+    socket.on('JoinOK', (data) => {
+      navigate(`/${data.id}/${data.players[0]}`);
+    });
+    socket.on('JoinKO', () => {
+      //put message so the frontend see the error
+    });
+    socket.on('CreateKO', (data) => {
+      console.log("coudlnt create room: ", data.error)
+    });
+    socket.on('CreateOK', (data) => {
+      navigate(`/${data.id}/${data.players.map((p) => p.client)}`)
+    });
+    socket.emit('askRoom');
     return () => {
       socket.off('roomUpdate');
+      socket.off('JoinOK');
+      socket.off('JoinKO');
+      socket.off('CreateKO')
+      socket.off('CreateOK')
     };
   }, []);
 
+  console.log(availableRooms);
   return (
     <>
     <CreateGameButton/>
     <div className="game-info-container">
-        <GameCard
-          key={45}
-          roomName={"TestoRoom"}
-          players={[ "Testeur"]}
-          status={EGameStatus.LOBBY}
-        />
-      {availableRooms.map((room, idx) => {console.log("toto ", room); return (
+      {availableRooms && availableRooms.map((room, idx) => {console.log("toto ", room); return (
         <GameCard
           key={idx}
-          roomName={"testRoom"}
-          players={[room.client]}
+          roomId={room.id}
+          players={room.players}
           status={EGameStatus.LOBBY}
         />
        )})}

@@ -5,10 +5,12 @@ import './GameCard.css';
 import { Board } from '../../game/Board';
 import { SocketUtils } from '../../../sockets/socketUtils';
 import { Link } from 'react-router-dom';
+import { socket } from '../../../sockets/socket';
+import { Player } from '../../../store/slices/gameSlice';
 
 export interface GameCardProps {
-  players: string[];
-  roomName: string;
+  players: Player[];
+  roomId: string;
   status: EGameStatus;
 }
 
@@ -34,7 +36,7 @@ const getColorFromStatus = (status: EGameStatus) => {
 
 const theme = AppDarkTheme;
 
-export const GameCard = ({ players, roomName, status }: GameCardProps) => {
+export const GameCard = ({ players, roomId, status }: GameCardProps) => {
   const isButtonDisabled = status !== EGameStatus.LOBBY;
   const playerShown = players;
   return (
@@ -64,7 +66,7 @@ export const GameCard = ({ players, roomName, status }: GameCardProps) => {
               <div
                 style={{ color: 'green', display: 'inline' }}
                 key={idx}>
-                {player}{' '}
+                {player.client}{' '}
               </div>
             ))
           ) : (
@@ -73,11 +75,9 @@ export const GameCard = ({ players, roomName, status }: GameCardProps) => {
         </div>
       </div>
       <div className="column-content join-button-container">
-        <LinkButton
-          link="/game"
-          disabled={isButtonDisabled}>
-          <Link to={`/${roomName}/${"testos"}`}>Join Game</Link>
-        </LinkButton>
+        <button onClick={() => SocketUtils.joinGame()}>
+          Join Game
+        </button>
       </div>
     </div>
   );

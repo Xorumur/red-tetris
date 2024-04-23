@@ -10,6 +10,8 @@ export const CreateGameButton = () => {
         socket.emit("Create", ({client: username}));
     }
 
+    // faire les sockets on pour createok et createko
+
     return (
         <div>
             <button onClick={createGame}>

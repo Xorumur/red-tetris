@@ -2,9 +2,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { EGameStatus } from '../../component/cards/GameCard/GameCard';
 
+export interface Player {
+  client: string
+}
+
 export interface Room {
-  socket: string;
-  client: string;
+  id: string;
+  players: Player[];
 }
 
 export interface GameInitialState {
