@@ -13,15 +13,19 @@ function alreadyInRoom(room, clientUsername) {
         return false;
 }
 
-// function sendMessageToRoom(room, event, data) {
-//     room.map((r) => {
-//         r.socket.send(event, data);
-//     });
-// }
+function gameById(games, id) {
+
+    const res = games.filter(game => game.roomId === id);
+
+    console.log("res", res)
+
+    return res;
+}
 
 function sendMessageToRoom(room, event, data) {
     room.players.forEach(element => {
-        element.socket.emit(event, data);
+        if (element.socket !== "test")
+            element.socket.emit(event, data);
     });
 }
 
@@ -120,6 +124,16 @@ function getRoomByName(room, username) {
     return resultWithoutSocket[0];
 }
 
+function getCompleteRoomByName(room, username) {
+    const result = room.filter(item =>
+        item.players.some(player =>
+            player.client === username
+        )
+    );
+
+    return result[0];
+}
+
 function isUsernameValid(user, username) {
     if (username === undefined || username === "")
         return false;
@@ -142,5 +156,7 @@ module.exports = {
     getRoom,
     createSimpleHash,
     isUsernameValid,
-    deleteSocket
+    deleteSocket,
+    getCompleteRoomByName,
+    gameById
 }

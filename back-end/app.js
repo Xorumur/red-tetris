@@ -1,8 +1,9 @@
 const http = require('http');
 const express = require('express');
 const socketIo = require('socket.io');
-const { alreadyInRoom, sendMessageToRoom, sendToAllUser, getWaitingRoom, getRoomByName, createHashRoomId, createSimpleHash, getRoom, isUsernameValid, deleteSocket } = require('./src/socket_utils.js');
+const { alreadyInRoom, sendMessageToRoom, sendToAllUser, getWaitingRoom, getRoomByName, createSimpleHash, getRoom, isUsernameValid, getCompleteRoomByName, gameById } = require('./src/socket_utils.js');
 const Game = require('./src/game.js');
+const { log } = require('console');
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
@@ -25,6 +26,7 @@ let     room = [
         ]
     }
 ];
+let games = [];
 
 server.listen(PORT, () => {
     console.log(`Serveur démarré sur le port ${PORT}`);
@@ -57,18 +59,21 @@ io.on('connection', (socket) => {
             return;
         }
 
-
         room.push({id : createSimpleHash(data.client), players : [{socket, client: data.client}]});
         const rooms = getRoomByName(room, data.client);
         socket.emit('CreateOK', rooms); 
-        sendToAllUser(user, 'roomUpdate', rooms);
+        sendToAllUser(user, 'roomUpdate', getRoom(room));
     })
 
     socket.on('Start', (data) => {
-        const currRoom = getRoomByName(room, data.client);
+        const currRoom = getCompleteRoomByName(room, data.client);
 
+        console.log("currRoom", currRoom);
+        const game = new Game(io, user, currRoom);
 
-        sendMessageToRoom(room, 'GameStarted', {});
+        games.push(game);
+
+        sendMessageToRoom(currRoom, 'GameStarted', {});
     });
 
     socket.on('Join', (data) => {
@@ -81,11 +86,11 @@ io.on('connection', (socket) => {
             return;
         }
 
-        const roomWithClient = room.find(item =>
-            item.players.some(player =>
-                player.client === data.player
-            )
+        const roomWithClient = room.find(item => 
+            item.id === data.roomId
         );
+
+        console.log("roomWithClient", roomWithClient);
         
         if (roomWithClient) {
             roomWithClient.players.push({
@@ -99,4 +104,60 @@ io.on('connection', (socket) => {
             socket.emit('JoinKO', { error: "Room not found" });
         }
     })
+
+    socket.on('Left', (data) => {
+        const socketId = socket.id;
+        const rooms = socket.rooms;
+        const roomNamesArray = Array.from(socket.rooms);
+
+        if (rooms.length <= 1)
+            return ;
+        else {
+            const test = games.filter(game => game.roomId === roomNamesArray[1]);
+            let game = null;
+            if (test.length === 0)
+                return ;
+            else 
+                game = test[0];
+            game.handleLeft();
+        }
+    });
+
+    socket.on('Right', (data) => {
+        const socketId = socket.id;
+        const rooms = socket.rooms;
+        const roomNamesArray = Array.from(socket.rooms);
+
+        if (rooms.length <= 1)
+            return ;
+        else {
+            const test = games.filter(game => game.roomId === roomNamesArray[1]);
+            let game = null;
+            if (test.length === 0)
+                return ;
+            else 
+                game = test[0];
+            game.handleRight();
+        }
+    });
+
+    socket.on('Down', (data) => {
+        const socketId = socket.id;
+        const rooms = socket.rooms;
+        const roomNamesArray = Array.from(socket.rooms);
+
+        if (rooms.length <= 1)
+            return ;
+        else {
+            const test = games.filter(game => game.roomId === roomNamesArray[1]);
+            let game = null;
+            if (test.length === 0)
+                return ;
+            else 
+                game = test[0];
+            game.handleDown();
+        }
+    });
 })
+
+module.exports = io;

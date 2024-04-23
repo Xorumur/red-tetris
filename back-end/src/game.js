@@ -141,8 +141,10 @@ const Tetriminos = [
     ]
 ];
 
+// const io = require('socket.io');
+
 class Game {
-        constructor(io, client, roomId) {
+    constructor(io, client, room) {
         this.GRID_WIDTH = 6;
         this.GRID_HEIGHT = 6;
         this.gameGrid = [];
@@ -152,23 +154,17 @@ class Game {
         this.io = io;
         this.client = client;
         this.game();
-        this.roomId = roomId;
+        this.roomId = room.id;
 
-        io.on('connection', (socket) => {
-            socket.on("left", (data) => {
-                if (this.collision(this.currentPiece, this.currentPiece.x - 1, this.currentPiece.y)) {
-                    return ;
-                } 
-            });
-
-            socket.on("right", (data) => {
-
-            });
-
-            socket.on("down", (data) => {
-
-            });
+        room.players.map((player) => {
+            if (player.socket !== 'test')
+                player.socket.join(this.roomId);
         });
+    }
+
+    isInRoom(socket) {
+        const room = io.scokets.in(this.roomId);
+        return room.connected[socket.id] !== undefined;
     }
 
     initializeGrid() {
@@ -206,27 +202,34 @@ class Game {
         };
     }
 
-    game() {
+    async game() {
         this.initBlock();
         console.log(this.currentPiece);
         while (this.collision(this.currentPiece) === false) {
+            let collisionDetected = false;
             for (let y = 0; y < this.gameGrid.length; y++) {
                 const copyPiece = this.copyPiece(this.currentPiece);
                 copyPiece.y++;
                 if (this.collision(copyPiece) === false) {
                     this.currentPiece.y++;
                 } else 
-                    break ;
-                console.log(this.getMap());
+                    collisionDetected = true;
+                if (collisionDetected)
+                    break; 
+                console.log("Map : ", this.getMap());
             }
+            await this.sleep(2000);
             this.saveCurrentPiece();
             this.initBlock();
         }
+        console.log("Game Over end map : ", this.getMap());
     }
 
     initBlock() {
         this.generateRandomPiece();
         this.currentPiece.x = Math.floor(this.GRID_WIDTH / 2) - Math.floor(this.currentPiece.shape[0].length / 2);
+        if (this.currentPiece.x === NaN)
+            this.currentPiece.x = Math.floor(this.GRID_WIDTH / 2);
     }
 b 
     collision(piece) {
@@ -234,7 +237,6 @@ b
             for (let x = 0; x < piece.shape[y].length; x++) {
                 if (piece.shape[y][x] !== 0) {
                     if (this.gameGrid[piece.y + y][piece.x + x] !== 0) {
-                        // console.log(this.gameGrid[piece.y + y][piece.x + x]);
                         return true;
                     }
                 }
@@ -284,6 +286,30 @@ b
         }
     }
 
+    handleLeft() {
+        this.eraseCurrentPiece();
+        this.currentPiece.x--;
+        if (this.collision(this.currentPiece)) {
+            this.currentPiece.x++;
+        }
+    }
+
+    handleRight() {
+        this.eraseCurrentPiece();
+        this.currentPiece.x++;
+        if (this.collision(this.currentPiece)) {
+            this.currentPiece.x--;
+        }
+    }
+
+    handleDown() {
+        this.eraseCurrentPiece();
+        this.currentPiece.y++;
+        if (this.collision(this.currentPiece)) {
+            this.currentPiece.y--;
+        }
+    }
+
     getMap() {
         // Créer une copie profonde de gameGrid
         let newMap = this.gameGrid.map(row => [...row]);
@@ -303,6 +329,12 @@ b
         if (this.currentPiece.currentForm >= this.currentPiece.forms.length)
             this.currentPiece.currentForm = 0;
         this.currentPiece.shape = this.currentPiece.forms[this.currentPiece.currentForm];
+    }
+
+    sleep(ms) {
+        return new Promise((resolve) => {
+            setTimeout(resolve, ms);
+        });
     }
 };
 
