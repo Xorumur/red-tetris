@@ -8,6 +8,12 @@ export interface ServerToClientEvents {
   UsernameKO: () => void; //if the username is refused
   JoinOK: (data: Room) => void;
   JoinKO: () => void;
+  CreateKO: (data: RequestError) => void;
+  CreateOK: (data: Room) => void;
+}
+
+interface RequestError {
+  error: string
 }
 
 interface Create {
