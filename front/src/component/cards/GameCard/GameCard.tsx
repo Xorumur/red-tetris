@@ -7,6 +7,8 @@ import { SocketUtils } from '../../../sockets/socketUtils';
 import { Link } from 'react-router-dom';
 import { socket } from '../../../sockets/socket';
 import { Player } from '../../../store/slices/gameSlice';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
 
 export interface GameCardProps {
   players: Player[];
@@ -38,6 +40,7 @@ const theme = AppDarkTheme;
 
 export const GameCard = ({ players, roomId, status }: GameCardProps) => {
   const isButtonDisabled = status !== EGameStatus.LOBBY;
+  const username = useSelector((state: RootState) => state.userSlice.username)!;
   const playerShown = players;
   return (
     <div
@@ -75,7 +78,7 @@ export const GameCard = ({ players, roomId, status }: GameCardProps) => {
         </div>
       </div>
       <div className="column-content join-button-container">
-        <button onClick={() => SocketUtils.joinGame()}>
+        <button onClick={() => SocketUtils.joinGame({client: username, roomId: roomId})}>
           Join Game
         </button>
       </div>

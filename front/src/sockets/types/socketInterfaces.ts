@@ -20,9 +20,9 @@ interface Create {
   client: string; //client username
 }
 
-interface JoinGame {
+export interface JoinGame {
   client: string,
-  username: string
+  roomId: string
 }
 
 export interface ClientToServerEvents {

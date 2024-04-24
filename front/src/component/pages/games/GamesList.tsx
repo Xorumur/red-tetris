@@ -17,6 +17,7 @@ export const GamesList = () => {
       setAvailableRooms(data);
     });
     socket.on('JoinOK', (data) => {
+      console.log(data);
       navigate(`/${data.id}/${data.players[0]}`);
     });
     socket.on('JoinKO', () => {

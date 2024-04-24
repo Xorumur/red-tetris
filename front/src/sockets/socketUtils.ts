@@ -1,4 +1,5 @@
 import { socket } from "./socket"
+import { JoinGame } from "./types/socketInterfaces";
 
 export namespace SocketUtils {
     export const createGame = () => {
@@ -6,7 +7,8 @@ export namespace SocketUtils {
         socket.emit("Create", {client: "NotJustJoe"}); //temporary
     }
 
-    export const joinGame = () => {
+    export const joinGame = (data: JoinGame) => {
+        socket.emit('Join', data);
     }
 
     export const setUsername = (username: string) => {
